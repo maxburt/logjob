@@ -157,6 +157,34 @@ def view_deleted():
             print(f"{i}. [{date}] {position} at {company}")
     print("-" * 40)
 
+
+def search_jobs():
+    keyword = input("Enter a keyword to search for: ").strip().lower()
+    if not keyword:
+        print("⚠️  No keyword entered.")
+        return
+
+    with open(filename, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        rows = list(reader)
+
+    if len(rows) <= 1:
+        print("📭 No jobs logged yet.")
+        return
+
+    print(f"\n🔍 Search results for '{keyword}':")
+    print("-" * 40)
+    found = False
+    for i, row in enumerate(rows[1:], 1):
+        if row and any(keyword in cell.lower() for cell in row):
+            date, position, company = row
+            print(f"{i}. [{date}] {position} at {company}")
+            found = True
+    if not found:
+        print("❌ No matching entries found.")
+    print("-" * 40)
+
+
 def show_help():
     print("""
 Usage:
@@ -167,6 +195,7 @@ Usage:
   logjob view             View job log entries
   logjob export           Export job log to Documents folder
   logjob view-deleted     View deleted job entries
+  logjob search           Search job log entries
   logjob help             Show this help message
 """)
 
@@ -188,5 +217,7 @@ if __name__ == "__main__":
         view_deleted()
     elif command in ("export", "e"):
         export_csv_copy()
+    elif command in ("search", "s"):
+        search_jobs()
     else:
         show_help()
