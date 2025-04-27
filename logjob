@@ -184,6 +184,45 @@ def search_jobs():
         print("❌ No matching entries found.")
     print("-" * 40)
 
+def show_stats():
+    with open(filename, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        rows = list(reader)
+
+    if len(rows) <= 1:
+        print("📭 No jobs logged yet.")
+        return
+
+    dates = []
+    companies = []
+    positions = []
+
+    for row in rows[1:]:
+        if row and any(cell.strip() for cell in row):
+            date, position, company = row
+            dates.append(date)
+            positions.append(position.lower())
+            companies.append(company.lower())
+
+    total_apps = len(dates)
+    earliest = min(dates)
+    latest = max(dates)
+
+    print("\n📊 Job Application Stats:")
+    print("-" * 40)
+    print(f"Total applications: {total_apps}")
+    print(f"Earliest application: {earliest}")
+    print(f"Most recent application: {latest}")
+
+    # Optional: top companies
+    from collections import Counter
+    top_companies = Counter(companies).most_common(3)
+    if top_companies:
+        print("\nTop companies applied to:")
+        for company, count in top_companies:
+            print(f"  {company.title()}: {count} application(s)")
+    print("-" * 40)
+
 
 def show_help():
     print("""
@@ -196,6 +235,7 @@ Usage:
   logjob export           Export job log to Documents folder
   logjob view-deleted     View deleted job entries
   logjob search           Search job log entries
+  logjob stats            Show job application statistics
   logjob help             Show this help message
 """)
 
@@ -219,5 +259,7 @@ if __name__ == "__main__":
         export_csv_copy()
     elif command in ("search", "s"):
         search_jobs()
+    elif command in ("stats", "stat", "st"):
+        show_stats()
     else:
         show_help()
